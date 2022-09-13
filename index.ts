@@ -17,6 +17,26 @@ import {
 } from '@drift-labs/sdk';
 import { Connection, PublicKey, Keypair } from '@solana/web3.js';
 
+let teamAddys = new Map<string, string>([
+	["GLAKETtJHrTwiDiZmPuNsW8RCfynobP2yKjyJMokJjVn", "George"],
+	["wi118WNNuZGLqgrznHDwzDnHKKmMCQmCyDGQCMRbZdj", "Will"],
+	["6aiE94djwgR72ozpDfFUdcSCpCuVAxkxTArWmfyzay6d", "Johno"],
+	["i8M6Rm9DcFzRhiLFrXsMF8H3hrkBwvEhGUzFQAH3PLa", "Cindy"],
+	["6sAaRdVhuuogN6Csr8r7sXpivhYBYjhcz9eNL3mhYTRR", "Su"],
+	["CrisPtzi6bzU8z654QkRbr6S3wiUG1rY6MShpdKhKoHv", "Chris"],
+	["x19zhryYtodTDgmRq6VLtQxbo4zfZUqa9hoobX47BeL", "Brennan"],
+	["29iErmt6WbsEVmE6Rm1HGRaor6b2kxxHrejPKrcbe37n", "Raj"],
+	["niCk6QHFU1kyU56Mdq5RJzKrecdkNSn23ZA6wduFdWS", "Nick"],
+	["3gXdi65BunRF2ZirJKMYcga2TAb5HgPZzkCBTqegro2u", "Dylan"],
+	["AYmNd1BENhEmqxDhNvfHDE9EzsMHpCnfhkpu3BWktctP", "Luke"],
+	["dWe7eT2mHkWgbhSNtBVN89sYAPNGFNvuHQXVUq2wh7N", "Vanessa"],
+	["AhyqQnpZZqn3YTxeYhUx3ZA6RrZm5yLJGabDbzZ5BPNF", "Mitzy"],
+	["BiGZJeWeQv9arWQ38vwTzb4SF8DoQ5GdCqNUrSKmqWRy", "BigZ"],
+	["9jMAUgoiHZXsoGomc6NFTvarZojxpNJPtz816zq2gQM6", "Damo"],
+	["2tdWByK1xSQVEhbYydxAxt3mR2uorjvM1Rk5NzrPKyb3", "Reina"],
+	["HCcUvWgSkb6UevUPcvUiuhUAefXgfGyppxK9tY434FPv", "David"]
+]);
+
 
 export async function saveUserSnapshots(
 	connection: Connection,
@@ -24,7 +44,7 @@ export async function saveUserSnapshots(
 	) {
 		
 		if (!clearingHouse.isSubscribed) {
-			clearingHouse.subscribe();
+			await clearingHouse.subscribe();
 		}
 		
 		const programUserAccounts = (await clearingHouse.program.account.user.all()) as any[];
@@ -48,7 +68,7 @@ export async function saveUserSnapshots(
 		await Promise.all(userArray.map((user) => user.subscribe()));
 		
 		console.log(
-			`Starting job to save user snapshots for ${userArray?.length} accounts`
+			`Found ${userArray?.length} accounts`
 		);
 		
 		for (const user of userArray) {
@@ -58,11 +78,17 @@ export async function saveUserSnapshots(
 			if (!user.accountSubscriber.isSubscribed) {
 				await user.accountSubscriber.subscribe();
 			}
-			const userPositionsSdk = user.getUserAccount().positions;
-			console.log("pub Key: " + user.getUserAccountPublicKey())
+			
+			//const userPositionsSdk = user.getUserAccount().positions;
+			//console.log("pub Key: " + user.getUserAccountPublicKey())
+			
+			//console.log(user.isSubscribed);
+			//console.log(clearingHouse.isSubscribed);
+
+			let totalPNL = new BN();
+			totalPNL = user.getBankAssetValue().add(user.getBankLiabilityValue()).add(user.getUnrealizedPNL());
+			console.log("pubkey: " + user.getUserAccount().authority + " has " + totalPNL.toString(10)/(1000000));
 		}
-
-
 	}
 
 
