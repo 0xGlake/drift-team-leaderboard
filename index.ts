@@ -2,14 +2,8 @@ import {
 	BigNum,
 	BN,
 	BulkAccountLoader,
-	calculatePositionPNL,
-	calculateUnsettledPnl,
 	ClearingHouse,
 	ClearingHouseUser,
-	MARK_PRICE_PRECISION,
-	PositionDirection,
-	QUOTE_PRECISION,
-	QUOTE_PRECISION_EXP,
 	Wallet,
 	Markets,
 	Banks,
@@ -37,8 +31,9 @@ let teamAddys = new Map<string, string>([
 	["HCcUvWgSkb6UevUPcvUiuhUAefXgfGyppxK9tY434FPv", "David"]
 ]);
 
+let teamLeaderboard = new Map<string, number>();
 
-export async function saveUserSnapshots(
+export async function processLeaderboard(
 	connection: Connection,
 	clearingHouse: ClearingHouse
 	) {
@@ -78,17 +73,23 @@ export async function saveUserSnapshots(
 			if (!user.accountSubscriber.isSubscribed) {
 				await user.accountSubscriber.subscribe();
 			}
-			
-			//const userPositionsSdk = user.getUserAccount().positions;
-			//console.log("pub Key: " + user.getUserAccountPublicKey())
-			
-			//console.log(user.isSubscribed);
-			//console.log(clearingHouse.isSubscribed);
 
-			let totalPNL = new BN();
-			totalPNL = user.getBankAssetValue().add(user.getBankLiabilityValue()).add(user.getUnrealizedPNL());
-			console.log("pubkey: " + user.getUserAccount().authority + " has " + totalPNL.toString(10)/(1000000));
+			let totalPNL = user.getBankAssetValue().add(user.getBankLiabilityValue()).add(user.getUnrealizedPNL());
+			
+			if (teamAddys.has(user.getUserAccount().authority.toString())){
+				console.log("Team member ", teamAddys.get(user.getUserAccount().authority.toString()));
+				teamLeaderboard.set(teamAddys.get(user.getUserAccount().authority.toString()) as string, totalPNL.toString(10)/(1000000));
+			} else {
+				console.log("pubkey: " + user.getUserAccount().authority + " has " + totalPNL.toString(10)/(1000000));
+			}
 		}
+
+		const mapSort1 = new Map([...teamLeaderboard.entries()].sort((a, b) => b[1] - a[1]));
+		
+		for (let [key, value] of mapSort1) {
+			console.log(key + " has " + value);
+		}
+		console.log(mapSort1);
 	}
 
 
@@ -127,4 +128,4 @@ const clearingHouse = new ClearingHouse({
 	}),
 });
 
-saveUserSnapshots(connection, clearingHouse);
+processLeaderboard(connection, clearingHouse);
