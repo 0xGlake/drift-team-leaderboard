@@ -17,10 +17,6 @@ import {
 } from '@drift-labs/sdk';
 import { Connection, PublicKey, Keypair } from '@solana/web3.js';
 
-// load default config
-const dotenv = require('dotenv');
-dotenv.config();
-
 
 export async function saveUserSnapshots(
 	connection: Connection,
@@ -53,15 +49,30 @@ export async function saveUserSnapshots(
 		
 		console.log(
 			`Starting job to save user snapshots for ${userArray?.length} accounts`
-			);
-			
-			
+		);
+		
+		for (const user of userArray) {
+			if (!user.isSubscribed) {
+				await user.subscribe();
+			}
+			if (!user.accountSubscriber.isSubscribed) {
+				await user.accountSubscriber.subscribe();
+			}
+			const userPositionsSdk = user.getUserAccount().positions;
+			console.log("pub Key: " + user.getUserAccountPublicKey())
+		}
+
+
 	}
 
-	const env = process.env.ENV;
-	console.log(`Using Endpoint: ${process.env.ENDPOINT}`);
 
-	
+// load default config
+const dotenv = require('dotenv');
+dotenv.config();
+
+const env = process.env.ENV;
+console.log(`Using Endpoint: ${process.env.ENDPOINT}`);
+
 const wallet = new Wallet(new Keypair());
 const endpoint = process.env.ENDPOINT as string;
 const connection = new Connection(endpoint, 'recent');
