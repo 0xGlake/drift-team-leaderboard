@@ -1,11 +1,16 @@
 import express from 'express';
-
 import {
+	BigNum,
+	BN,
+	BulkAccountLoader,
+	calculatePositionPNL,
+	calculateUnsettledPnl,
 	ClearingHouse,
 	ClearingHouseUser,
-	DevnetMarkets,
-	convertToNumber,
-	QUOTE_PRECISION
+	MARK_PRICE_PRECISION,
+	PositionDirection,
+	QUOTE_PRECISION,
+	QUOTE_PRECISION_EXP,
 } from '@drift-labs/sdk';
 
 const app = express();
@@ -33,27 +38,33 @@ const driftTeamAddys = [
 
 
 app.get('/', (req, res) => {
-  let text = "";
-	DevnetMarkets.forEach(e => {
-    text += e.marketIndex + ": " + e.symbol + "<br>";
-  });
 
-  text += "<br><br><br><br> users:<br>";
-	
-  //console.log(`${users}`)
+	async function saveUserSnapshots(
+		clearingHouse = ClearingHouse
+	) {
+		try {
+			if (!clearingHouse.isSubscribed) {
+				clearingHouse.subscribe();
+			}
+			const programUserAccounts = (await clearingHouse.program.account.user.all());
 
-	/*
-	const users = ClearingHouse.program.account.user.all();
+			for (const programUserAccount of programUserAccounts) {
+				console.log(programUserAccount.publicKey);
+			}
 
-	users.forEach(e => {
-		totalUserCollateral += convertToNumber(
-			e.account.collateral,
-			QUOTE_PRECISION
-		);
-		console.log("collateral: ",totalUserCollateral);
-	});
-	*/
-	
+		} catch (err) {
+			RollbarClient.rollbar.critical({
+				context: ROLLBAR_USERSNAPSHOT_CONTEXT,
+				message: 'User snapshot jobs failed with error',
+				error: err,
+			});
+		}
+	}
+
+	let text = ""
+
+
+
   res.send(`${text}`);
 });
 
