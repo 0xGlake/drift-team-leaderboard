@@ -22,13 +22,14 @@ let teamAddys = new Map<string, string>([
 	["29iErmt6WbsEVmE6Rm1HGRaor6b2kxxHrejPKrcbe37n", "Raj"],
 	["niCk6QHFU1kyU56Mdq5RJzKrecdkNSn23ZA6wduFdWS", "Nick"],
 	["3gXdi65BunRF2ZirJKMYcga2TAb5HgPZzkCBTqegro2u", "Dylan"],
-	["AYmNd1BENhEmqxDhNvfHDE9EzsMHpCnfhkpu3BWktctP", "Luke"],
+	["LUKEsMb7fu64BVHStVfNB4DisR6g62wfq7mgjqymepp", "Luke"],
 	["dWe7eT2mHkWgbhSNtBVN89sYAPNGFNvuHQXVUq2wh7N", "Vanessa"],
 	["AhyqQnpZZqn3YTxeYhUx3ZA6RrZm5yLJGabDbzZ5BPNF", "Mitzy"],
 	["BiGZJeWeQv9arWQ38vwTzb4SF8DoQ5GdCqNUrSKmqWRy", "BigZ"],
 	["9jMAUgoiHZXsoGomc6NFTvarZojxpNJPtz816zq2gQM6", "Damo"],
 	["2tdWByK1xSQVEhbYydxAxt3mR2uorjvM1Rk5NzrPKyb3", "Reina"],
-	["HCcUvWgSkb6UevUPcvUiuhUAefXgfGyppxK9tY434FPv", "David"]
+	["HCcUvWgSkb6UevUPcvUiuhUAefXgfGyppxK9tY434FPv", "David"],
+	["LUiqSfUDMLWncsE1wfZGWr5hnv6V3WmWLW2XyKPctcS", "Luigi"]
 ]);
 
 let teamLeaderboard = new Map<string, number>();
