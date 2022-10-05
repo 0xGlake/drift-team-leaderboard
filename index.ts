@@ -7,21 +7,19 @@ import {
 	Wallet,
 	Markets,
 	Banks,
-	initialize,
-	DriftConfig,
-	DriftEnv
+	initialize
 } from '@drift-labs/sdk';
 import { Connection, PublicKey, Keypair } from '@solana/web3.js';
 
 let teamAddys = new Map<string, string>([
 	["GLAKETtJHrTwiDiZmPuNsW8RCfynobP2yKjyJMokJjVn", "George"],
 	["wi118WNNuZGLqgrznHDwzDnHKKmMCQmCyDGQCMRbZdj", "Will"],
-	["DUcKyHCi6eikB3EWWPYXjq8bgxJVRdri3xriZrUXNoZU", "Johno"],
+	["6aiE94djwgR72ozpDfFUdcSCpCuVAxkxTArWmfyzay6d", "Johno"],
 	["i8M6Rm9DcFzRhiLFrXsMF8H3hrkBwvEhGUzFQAH3PLa", "Cindy"],
 	["6sAaRdVhuuogN6Csr8r7sXpivhYBYjhcz9eNL3mhYTRR", "Su"],
 	["CrisPtzi6bzU8z654QkRbr6S3wiUG1rY6MShpdKhKoHv", "Chris"],
 	["x19zhryYtodTDgmRq6VLtQxbo4zfZUqa9hoobX47BeL", "Brennan"],
-	["DBRknWQEGyiYxwHYV1amHNnycqLqzwWMfx1RD3LZ8eK3", "Raj"],
+	["29iErmt6WbsEVmE6Rm1HGRaor6b2kxxHrejPKrcbe37n", "Raj"],
 	["niCk6QHFU1kyU56Mdq5RJzKrecdkNSn23ZA6wduFdWS", "Nick"],
 	["3gXdi65BunRF2ZirJKMYcga2TAb5HgPZzkCBTqegro2u", "Dylan"],
 	["LUKEsMb7fu64BVHStVfNB4DisR6g62wfq7mgjqymepp", "Luke"],
@@ -34,13 +32,13 @@ let teamAddys = new Map<string, string>([
 	["LUiqSfUDMLWncsE1wfZGWr5hnv6V3WmWLW2XyKPctcS", "Luigi"]
 ]);
 
+let teamLeaderboard = new Map<string, number>();
 
 export async function processLeaderboard(
 	connection: Connection,
 	clearingHouse: ClearingHouse
 	) {
 		
-		let teamLeaderboard = new Map<string, number>();
 		if (!clearingHouse.isSubscribed) {
 			await clearingHouse.subscribe();
 		}
@@ -78,7 +76,7 @@ export async function processLeaderboard(
 			}
 
 			let totalPNL = user.getBankAssetValue().add(user.getBankLiabilityValue()).add(user.getUnrealizedPNL());
-
+			
 			if (teamAddys.has(user.getUserAccount().authority.toString())){
 				console.log("Team member ", teamAddys.get(user.getUserAccount().authority.toString()));
 				teamLeaderboard.set(teamAddys.get(user.getUserAccount().authority.toString()) as string, totalPNL.toString(10)/(1000000));
@@ -101,7 +99,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const env = process.env.ENV;
-
 console.log(`Using Endpoint: ${process.env.ENDPOINT}`);
 
 const wallet = new Wallet(new Keypair());
@@ -110,24 +107,15 @@ const connection = new Connection(endpoint, 'recent');
 
 export const CONNECTION = { connection };
 
-
-const configEdit: Partial<DriftConfig> = {
-	CLEARING_HOUSE_PROGRAM_ID: "6MVFno8SFkVffGuCCQzg2wi8FvF8sPRFDNHa13ZPP9cK"
-}
-
-
-const sdkConfig = initialize( { env: process.env.ENV as DriftEnv, overrideEnv: configEdit });
-
-
+//@ts-ignore
+const sdkConfig = initialize({ env: env });
 //InitializeCommon(process.env.ENV as DriftEnv);
 
 const clearingHouseProgramId = new PublicKey(
 	sdkConfig.CLEARING_HOUSE_PROGRAM_ID
-	//process.env.CLEARING_HOUSE_PROGRAM_ID!
 );
 
-console.log(`Using Program ID ${process.env.CLEARING_HOUSE_PROGRAM_ID}`);
-console.log(`Program ID working ${sdkConfig.CLEARING_HOUSE_PROGRAM_ID}`);
+console.log(`Using Program ID ${sdkConfig.CLEARING_HOUSE_PROGRAM_ID}`);
 
 // const bulkAccountLoader = new BulkAccountLoader(connection, 'confirmed', 5000);
 const clearingHouse = new ClearingHouse({
