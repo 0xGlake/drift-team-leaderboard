@@ -5,9 +5,9 @@ import {
 	ClearingHouse,
 	ClearingHouseUser,
 	Wallet,
-	Markets,
-	Banks,
-	initialize
+	PerpMarkets,
+	SpotMarkets,
+	initialize,
 } from '@drift-labs/sdk';
 import { Connection, PublicKey, Keypair } from '@solana/web3.js';
 
@@ -117,16 +117,24 @@ const clearingHouseProgramId = new PublicKey(
 
 console.log(`Using Program ID ${sdkConfig.CLEARING_HOUSE_PROGRAM_ID}`);
 
-// const bulkAccountLoader = new BulkAccountLoader(connection, 'confirmed', 5000);
 const clearingHouse = new ClearingHouse({
 	connection,
 	wallet,
 	programID: clearingHouseProgramId,
-	marketIndexes: Markets[sdkConfig.ENV].map((mkt) => mkt.marketIndex),
-	bankIndexes: Banks[sdkConfig.ENV].map((bank) => bank.bankIndex),
-	oracleInfos: Markets[sdkConfig.ENV].map((mkt) => {
+	perpMarketIndexes: PerpMarkets[sdkConfig.ENV].map((mkt) => mkt.marketIndex),
+	spotMarketIndexes: SpotMarkets[sdkConfig.ENV].map((mkt) => mkt.marketIndex),
+	oracleInfos: PerpMarkets[sdkConfig.ENV].map((mkt) => {
 		return { publicKey: mkt.oracle, source: mkt.oracleSource };
 	}),
 });
+
+clearingHouse
+	.subscribe()
+	.then(() => {
+		console.log('clearing house successfully subscribed');
+	})
+	.catch(() => {
+		console.log('clearing failed to subscribe');
+	});
 
 processLeaderboard(connection, clearingHouse);
