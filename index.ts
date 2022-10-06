@@ -75,7 +75,7 @@ export async function processLeaderboard(
 				await user.accountSubscriber.subscribe();
 			}
 
-			let totalPNL = user.getBankAssetValue().add(user.getBankLiabilityValue()).add(user.getUnrealizedPNL());
+			let totalPNL = user.getTotalCollateral().add(user.getTotalPerpPositionValue()).add(user.getUnrealizedPNL());
 			
 			if (teamAddys.has(user.getUserAccount().authority.toString())){
 				console.log("Team member ", teamAddys.get(user.getUserAccount().authority.toString()));
